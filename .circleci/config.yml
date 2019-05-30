@@ -36,7 +36,7 @@ jobs:
             -Dsonar.sources=. \
             -Dsonar.host.url=$SONAR_HOST \
             -Dsonar.login=$SONAR_LOGIN \
-            -Dsonar.exclusions=sonar-scanner-3.2.0.1227-linux
+            -Dsonar.exclusions=sonar-scanner-3.2.0.1227-linux/**
       - run:
           name: Run SourceClear scan
           command: curl -sSL https://download.sourceclear.com/ci.sh | sh
