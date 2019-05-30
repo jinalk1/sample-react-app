@@ -1,0 +1,46 @@
+version: 2
+orbs:
+  aws-s3: circleci/aws-s3@1.0.0
+jobs:
+  build:
+    working_directory: ~/temp
+    docker:
+      - image: circleci/node:8.10
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: install-npm-package
+          command: npm install
+      - run:
+          name: Install AWS CLI
+          command: sudo apt-get -y -qq install awscli
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: echo CIRCLE_BUILD_NUM
+          command: echo $CIRCLE_BUILD_NUM
+      - run:
+          name: Install Sonarqube scanner
+          command: |
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227-linux.zip
+            unzip sonar-scanner-cli-3.2.0.1227-linux.zip
+      - run:
+          name: Run Sonarqube scanner
+          command: |
+            eval ./sonar-scanner-3.2.0.1227-linux/bin/sonar-scanner  -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.organization=$SONAR_ORG \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST \
+            -Dsonar.login=$SONAR_LOGIN
+      - run:
+          name: Run SourceClear scan
+          command: curl -sSL https://download.sourceclear.com/ci.sh | sh
+      - run:
+          name: zip-package
+          command: zip -r sample-lambda-api-$CIRCLE_BUILD_NUM.zip .
+      - store_artifacts:
+          path: sample-lambda-api-$CIRCLE_BUILD_NUM.zip
