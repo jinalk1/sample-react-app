@@ -35,12 +35,13 @@ jobs:
             -Dsonar.organization=$SONAR_ORG \
             -Dsonar.sources=. \
             -Dsonar.host.url=$SONAR_HOST \
-            -Dsonar.login=$SONAR_LOGIN
+            -Dsonar.login=$SONAR_LOGIN \
+            -Dsonar.exclusions=sonar-scanner-3.2.0.1227-linux
       - run:
           name: Run SourceClear scan
           command: curl -sSL https://download.sourceclear.com/ci.sh | sh
       - run:
           name: zip-package
-          command: zip -r sample-lambda-api-$CIRCLE_BUILD_NUM.zip .
+          command: zip -r sample-react-app-$CIRCLE_BUILD_NUM.zip .
       - store_artifacts:
-          path: sample-lambda-api-$CIRCLE_BUILD_NUM.zip
+          path: sample-react-app-$CIRCLE_BUILD_NUM.zip
